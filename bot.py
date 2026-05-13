@@ -7,7 +7,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
-logger = logging.getLogger(__name__)
 
 TOKEN = os.environ["BOT_TOKEN"]
 
@@ -19,7 +18,6 @@ async def start(update: Update, context):
     )
 
 async def handle_photo(update: Update, context):
-    user = update.message.from_user
     await update.message.reply_text(
         "✅ Screenshots received! Thank you.\n\n"
         "I review all submissions manually within 1 hour.\n"
@@ -27,11 +25,10 @@ async def handle_photo(update: Update, context):
     )
 
 def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-    logger.info("Bot running...")
-    app.run_polling()
+    application = Application.builder().token(TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    application.run_polling()
 
 if __name__ == "__main__":
     main()
