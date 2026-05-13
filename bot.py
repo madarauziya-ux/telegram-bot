@@ -1,9 +1,18 @@
 import os
+import logging
 from datetime import datetime
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 TOKEN = os.environ.get("BOT_TOKEN")
+
+if not TOKEN:
+    logger.error("BOT_TOKEN not found!")
+    exit(1)
+
 SCREENSHOTS_FOLDER = "submissions"
 os.makedirs(SCREENSHOTS_FOLDER, exist_ok=True)
 
@@ -32,13 +41,15 @@ async def handle_photo(update: Update, context):
         "✅ Screenshots received! Thank you.\n\n"
         "I review all submissions manually within 1 hour.\n"
         "If valid, you'll be added to the channel.\n\n"
-        "Please don't send multiple times — it won't speed things up!"
+        "Please don't send multiple times."
     )
 
-app = Application.builder().token(TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+def main():
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    logger.info("Bot is running...")
+    app.run_polling()
 
 if __name__ == "__main__":
-    print("Bot is running...")
-    app.run_polling()
+    main()
